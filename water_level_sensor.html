@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💧 Датчик воды: 7 инженерных экспериментов</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
+            background: #f5f7fa;
+            color: #1e2b3c;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px;
+            line-height: 1.6;
+        }
+        h1 {
+            background: #0a3143;
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 0 #051f2a;
+            font-weight: 500;
+            letter-spacing: 1px;
+            border-left: 12px solid #4fc3f7;
+        }
+        h2 {
+            background: #2c3e50;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 8px;
+            margin-top: 45px;
+            font-weight: 400;
+            border-bottom: 4px solid #4fc3f7;
+            display: inline-block;
+        }
+        h3 {
+            color: #0a3143;
+            font-weight: 600;
+            border-left: 6px solid #4fc3f7;
+            padding-left: 18px;
+            margin: 30px 0 20px;
+        }
+        .exp {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            margin: 30px 0;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+        .scheme-box {
+            background: #eef7fc;
+            border: 2px solid #4fc3f7;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            color: #0a3143;
+            border-left: 8px solid #0288d1;
+        }
+        .code-block {
+            background: #0f1a24;
+            color: #e4f0fb;
+            padding: 22px;
+            border-radius: 14px;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            font-size: 15px;
+            line-height: 1.5;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            margin: 25px 0;
+            border-left: 8px solid #4fc3f7;
+        }
+        .fact {
+            background: #f1f9fe;
+            border-left: 8px solid #0288d1;
+            border-radius: 12px;
+            padding: 18px 25px;
+            margin: 20px 0;
+            font-size: 1.05em;
+        }
+        .warning {
+            background: #ffefed;
+            border-left: 8px solid #d32f2f;
+            border-radius: 12px;
+            padding: 18px 25px;
+        }
+        .pin-table {
+            background: #2c3e50;
+            color: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+        }
+        td, th {
+            border: 1px solid #b0d4e8;
+            padding: 14px;
+            text-align: left;
+        }
+        th {
+            background: #0288d1;
+            color: white;
+        }
+        .pin-reference {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            background: #0a3143;
+            color: white;
+            padding: 25px;
+            border-radius: 16px;
+            margin: 30px 0;
+        }
+    </style>
+</head>
+<body>
+
+<h1>💧 ДАТЧИК УРОВНЯ ВОДЫ · 7 ИНЖЕНЕРНЫХ ЭКСПЕРИМЕНТОВ</h1>
+
+<p style="font-size: 1.3em; background: white; padding: 20px; border-radius: 12px; border-left: 12px solid #4fc3f7;">
+    Принцип работы: датчик измеряет электрическое сопротивление между дорожками. Вода проводит ток — сопротивление падает, напряжение на аналоговом пине растёт.
+</p>
+
+<!-- ============== БАЗОВАЯ СХЕМА ============== -->
+<div class="pin-reference">
+    <div style="grid-column: 1/-1; margin-bottom: 10px;">
+        <span style="background: #4fc3f7; color: #0a3143; padding: 8px 20px; border-radius: 30px; font-weight: 700;">🔌 БАЗОВОЕ ПОДКЛЮЧЕНИЕ (все эксперименты)</span>
+    </div>
+    <div><span style="background: #d32f2f; color: white; padding: 5px 12px; border-radius: 20px;">VCC</span> → 5V (питание)</div>
+    <div><span style="background: #2e7d32; color: white; padding: 5px 12px; border-radius: 20px;">GND</span> → GND (земля)</div>
+    <div><span style="background: #ffb300; color: black; padding: 5px 12px; border-radius: 20px;">SIG</span> → A0 (аналоговый сигнал)</div>
+    <div style="grid-column: 1/-1; margin-top: 15px;">
+        <div style="position: relative; width: 100%; padding-top: calc(max(56.25%, 400px));">
+            <iframe src="https://app.cirkitdesigner.com/project/bbfcadd9-662f-4117-8219-6e03439b8431?view=interactive_preview" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;"></iframe>
+        </div>
+    </div>
+</div>
+
+<!-- ============== ЭКСПЕРИМЕНТ 1 ============== -->
+<h2>📌 ЭКСПЕРИМЕНТ 1 · ЧТЕНИЕ СЫРЫХ ДАННЫХ</h2>
+<div class="exp">
+    <h3>analogRead() · Монитор порта · Диапазон 0–1023</h3>
+    
+    <div class="scheme-box">
+        Схема та же, что и в базовом подключении.<br>
+    </div>
+
+    <div class="code-block">
+// ЭКСПЕРИМЕНТ 1: Мониторинг сырых значений
+// Задача: наблюдать, как меняется сигнал в воздухе, при касании, при погружении
+
+#define SENSOR_PIN A0
+
+void setup() {
+  Serial.begin(9600);
+  Serial.println("=== ДАТЧИК ВОДЫ: РЕЖИМ ИЗМЕРЕНИЙ ===");
+  Serial.println("Воздух | Касание | Погружение");
+  Serial.println("0-1023");
+}
+
+void loop() {
+  int rawValue = analogRead(SENSOR_PIN);
+  
+  Serial.print("Сырой сигнал: ");
+  Serial.print(rawValue);
+  
+  // Комментарий по состоянию
+  if (rawValue < 50) Serial.print(" — СУХО (воздух)");
+  else if (rawValue < 300) Serial.print(" — ВЛАЖНО (конденсат/касание)");
+  else if (rawValue < 600) Serial.print(" — МОКРО (частичное погружение)");
+  else Serial.print(" — ПОЛНОЕ ПОГРУЖЕНИЕ");
+  
+  Serial.println();
+  delay(300);
+}
+    </div>
+
+    <div class="fact">
+        🔬 <strong>ФАКТ О КОДЕ:</strong> analogRead() возвращает значение от 0 до 1023. Это потому, что АЦП (аналого-цифровой преобразователь) Arduino — 10-битный. 2¹⁰ = 1024 дискретных уровня. Напряжение 0В = 0, 5В = 1023. Датчик работает как переменный резистор: сухой → высокое сопротивление → низкое напряжение (ближе к 0). Мокрый → низкое сопротивление → высокое напряжение (ближе к 5В).
+    </div>
+    
+    <div class="fact">
+        📊 <strong>ПРИМЕНЕНИЕ:</strong> В реальных системах такие сырые значения никогда не используют напрямую. Всегда применяют калибровку и привязку к физическим величинам (мм, %, мл).
+    </div>
+</div>
+
+<!-- ============== ЭКСПЕРИМЕНТ 2 ============== -->
+<h2>📌 ЭКСПЕРИМЕНТ 2 · ПОРОГОВОЕ СРАБАТЫВАНИЕ</h2>
+<div class="exp">
+    <h3>if (value > threshold) · digitalWrite · Простейший детектор</h3>
+    
+    <div style="position: relative; width: 100%; padding-top: calc(max(56.25%, 400px));">
+        <iframe src="https://app.cirkitdesigner.com/project/417108ed-fd65-4d76-af90-cf9107fe6c60?view=interactive_preview" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;"></iframe>
+    </div>
+
+    <div class="code-block">
+// ЭКСПЕРИМЕНТ 2: Световая индикация превышения порога
+// Встроенный светодиод на пине 13 загорается при обнаружении воды
+
+#define SENSOR A0
+#define LED 13
+
+int threshold = 300;  // Эмпирическое значение (зависит от датчика)
+
+void setup() {
+  pinMode(LED, OUTPUT);
+  Serial.begin(9600);
+  Serial.println("=== ПОРОГОВЫЙ ДЕТЕКТОР ===");
+  Serial.print("Порог срабатывания: ");
+  Serial.println(threshold);
+}
+
+void loop() {
+  int value = analogRead(SENSOR);
+  
+  if (value > threshold) {
+    digitalWrite(LED, HIGH);  // Вода есть
+  } else {
+    digitalWrite(LED, LOW);   // Воды нет
+  }
+  
+  // Для отладки выводим каждые 500 мс
+  static unsigned long lastPrint = 0;
+  if (millis() - lastPrint > 500) {
+    lastPrint = millis();
+    Serial.print("Сигнал: ");
+    Serial.print(value);
+    Serial.print(" — ");
+    Serial.println(value > threshold ? "ВОДА" : "СУХО");
+  }
+}
+    </div>
+
+    <div class="fact">
+        ⚡ <strong>ФАКТ О КОДЕ:</strong> Использование <code>static unsigned long lastPrint</code> — это приём для неблокирующих задержек. В отличие от <code>delay()</code>, он позволяет опрашивать датчик максимально часто, но выводить в порт только раз в полсекунды. Так мы не пропускаем быстрые изменения.
+    </div>
+    
+    <div class="fact">
+        🧠 <strong>ПРОБЛЕМА ПОРОГА:</strong> Значение 300 взято "с потолка". У разных экземпляров датчиков, при разном напряжении питания, в разной воде показания отличаются. Инженерное решение — калибровка (эксперимент 5).
+    </div>
+</div>
+
+<!-- ============== ЭКСПЕРИМЕНТ 3 ============== -->
+<h2>📌 ЭКСПЕРИМЕНТ 3 · ЗВУКОВАЯ СИГНАЛИЗАЦИЯ</h2>
+<div class="exp">
+    <h3>Пьезозуммер · Частота · Предупреждение о превышении</h3>
+    
+    <div style="position: relative; width: 100%; padding-top: calc(max(56.25%, 400px));">
+        <iframe src="https://app.cirkitdesigner.com/project/6710c279-e38f-4af5-b219-58a6ed3e5672?view=interactive_preview" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;"></iframe>
+    </div>
+
+    <div class="code-block">
+// ЭКСПЕРИМЕНТ 3: Звуковое оповещение
+// Активный зуммер (генерирует тон сам при подаче HIGH)
+
+#define SENSOR A0
+#define BUZZER 8
+#define THRESHOLD 350
+
+void setup() {
+  pinMode(BUZZER, OUTPUT);
+  Serial.begin(9600);
+  Serial.println("=== ЗВУКОВОЙ СИГНАЛИЗАТОР ===");
+}
+
+void loop() {
+  int value = analogRead(SENSOR);
+  
+  if (value > THRESHOLD) {
+    digitalWrite(BUZZER, HIGH);
+    Serial.println("⚠️ ПРЕВЫШЕНИЕ УРОВНЯ");
+  } else {
+    digitalWrite(BUZZER, LOW);
+  }
+  
+  delay(50);  // Небольшая задержка для стабильности
+}
+    </div>
+
+    <div class="fact">
+        🔊 <strong>ФАКТ О КОМПОНЕНТАХ:</strong> Активный зуммер имеет встроенный генератор частоты — достаточно подать напряжение, и он пищит. Пассивный зуммер требует генерации сигнала через <code>tone()</code>. В проектах с водой активный зуммер предпочтительнее — меньше проводов и кода.
+    </div>
+    
+    <div class="fact">
+        📏 <strong>МАСШТАБИРОВАНИЕ:</strong> В промышленных системах звуковая сигнализация всегда дублируется световой. Человек хуже слышит высокие частоты с возрастом — поэтому используют прерывистый сигнал (мигание + писк).
+    </div>
+</div>
+
+<!-- ============== ЭКСПЕРИМЕНТ 4 ============== -->
+<h2>📌 ЭКСПЕРИМЕНТ 4 · АНАЛОГОВАЯ ИНДИКАЦИЯ</h2>
+<div class="exp">
+    <h3>map() · constrain() · Яркость = Уровень воды</h3>
+    
+    <div style="position: relative; width: 100%; padding-top: calc(max(56.25%, 400px));">
+        <iframe src="https://app.cirkitdesigner.com/project/735653dd-d17a-4eba-94b5-758fcfba3538?view=interactive_preview" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;"></iframe>
+    </div>
+
+    <div class="code-block">
+// ЭКСПЕРИМЕНТ 4: Аналоговая индикация
+// Яркость светодиода пропорциональна уровню воды
+
+#define SENSOR A0
+#define LED_PWM 9  // Обязательно PWM (~) пин!
+
+int dryValue = 60;     // Значение в сухом воздухе (измерить заранее)
+int wetValue = 700;    // Значение в полностью погруженном состоянии
+
+void setup() {
+  pinMode(LED_PWM, OUTPUT);
+  Serial.begin(9600);
+  Serial.println("=== АНАЛОГОВАЯ ИНДИКАЦИЯ ===");
+  Serial.print("Диапазон калибровки: ");
+  Serial.print(dryValue);
+  Serial.print(" — ");
+  Serial.println(wetValue);
+}
+
+void loop() {
+  int raw = analogRead(SENSOR);
+  
+  // Ограничиваем значения в пределах калибровки
+  raw = constrain(raw, dryValue, wetValue);
+  
+  // Преобразуем диапазон датчика (dry..wet) в диапазон ШИМ (0..255)
+  int brightness = map(raw, dryValue, wetValue, 0, 255);
+  
+  analogWrite(LED_PWM, brightness);
+  
+  // Отладка
+  static unsigned long lastPrint = 0;
+  if (millis() - lastPrint > 800) {
+    lastPrint = millis();
+    Serial.print("Сырой: ");
+    Serial.print(raw);
+    Serial.print(" | Яркость: ");
+    Serial.println(brightness);
+  }
+}
+    </div>
+
+    <div class="fact">
+        🔄 <strong>ФАКТ О MAP():</strong> Функция <code>map(value, fromLow, fromHigh, toLow, toHigh)</code> — пропорциональное масштабирование. Она НЕ ограничивает значения. Если raw = 800, а wetValue = 700, то map() вернёт значение больше 255. Именно поэтому перед map() всегда ставят <code>constrain()</code>.
+    </div>
+    
+    <div class="fact">
+        ⚡ <strong>PWM (ШИМ):</strong> analogWrite() не выдаёт аналоговое напряжение, а генерирует прямоугольные импульсы. 0 = 0В, 255 = 5В постоянно, 127 = 2.5В (50% времени 5В, 50% 0В). Глаз видит это как яркость.
+    </div>
+</div>
+
+<!-- ============== ЭКСПЕРИМЕНТ 5 ============== -->
+<h2>📌 ЭКСПЕРИМЕНТ 5 · АВТОМАТИЧЕСКАЯ КАЛИБРОВКА</h2>
+<div class="exp">
+    <h3>Кнопка · INPUT_PULLUP · Усреднение · Запоминание</h3>
+    
+    <div style="position: relative; width: 100%; padding-top: calc(max(56.25%, 400px));">
+        <iframe src="https://app.cirkitdesigner.com/project/db222d5c-b776-4a6c-b609-5fefe112dbac?view=interactive_preview" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;"></iframe>
+    </div>
+
+    <div class="code-block">
+// ЭКСПЕРИМЕНТ 5: Автоматическая калибровка
+// Кнопка: нажать в воздухе — запомнить сухо
+// Кнопка: нажать в воде — запомнить мокро
+
+#define SENSOR A0
+#define BUTTON 2
+#define LED 13
+
+int dryValue = 0;
+int wetValue = 0;
+bool calibrated = false;
+
+void setup() {
+  pinMode(BUTTON, INPUT_PULLUP);  // Внутренний подтягивающий резистор
+  pinMode(LED, OUTPUT);
+  Serial.begin(9600);
+  Serial.println("=== РЕЖИМ КАЛИБРОВКИ ===");
+  Serial.println("1. Держите датчик СУХИМ, нажмите кнопку");
+}
+
+void loop() {
+  if (digitalRead(BUTTON) == LOW) {
+    delay(200);  // Антидребезг
+    
+    if (dryValue == 0) {
+      // Калибровка сухого состояния
+      dryValue = readAverage(20);  // Усредняем 20 измерений
+      Serial.print("✅ СУХО зафиксировано: ");
+      Serial.println(dryValue);
+      Serial.println("2. Опустите датчик в ВОДУ, нажмите кнопку");
+      blinkLED(2);
+    }
+    else if (wetValue == 0) {
+      // Калибровка мокрого состояния
+      wetValue = readAverage(20);
+      Serial.print("✅ МОКРО зафиксировано: ");
+      Serial.println(wetValue);
+      calibrated = true;
+      Serial.println("=== КАЛИБРОВКА ЗАВЕРШЕНА ===");
+      blinkLED(3);
+    }
+    
+    while(digitalRead(BUTTON) == LOW);  // Ждём отпускания
+    delay(200);
+  }
+  
+  // Режим измерения
+  if (calibrated) {
+    int raw = analogRead(SENSOR);
+    raw = constrain(raw, dryValue, wetValue);
+    int percent = map(raw, dryValue, wetValue, 0, 100);
+    
+    Serial.print("📊 ВЛАЖНОСТЬ: ");
+    Serial.print(percent);
+    Serial.println("%");
+    
+    // Индикация яркостью (пульсация)
+    int brightness = map(percent, 0, 100, 0, 255);
+    analogWrite(LED, brightness);  // 13 пин не PWM! Заменить на 9,10,11 в реальной схеме
+    // Для пина 13 используем мигание с разной частотой
+    digitalWrite(LED, HIGH);
+    delay(percent * 2);
+    digitalWrite(LED, LOW);
+    delay(percent * 2);
+  }
+  
+  delay(100);
+}
+
+// Функция усреднения для подавления шумов
+int readAverage(int samples) {
+  long sum = 0;
+  for (int i = 0; i < samples; i++) {
+    sum += analogRead(SENSOR);
+    delay(10);
+  }
+  return sum / samples;
+}
+
+// Функция мигания для обратной связи
+void blinkLED(int count) {
+  for (int i = 0; i < count; i++) {
+    digitalWrite(LED, HIGH);
+    delay(150);
+    digitalWrite(LED, LOW);
+    delay(150);
+  }
+}
+    </div>
+
+    <div class="fact">
+        🎛️ <strong>ФАКТ О INPUT_PULLUP:</strong> <code>INPUT_PULLUP</code> активирует внутренний резистор 20–50 кОм, подтягивающий пин к +5В. Кнопка замыкает пин на GND. Когда кнопка не нажата — читаем HIGH. Нажата — LOW. Это экономит внешние компоненты.
+    </div>
+    
+    <div class="fact">
+        📈 <strong>ФАКТ ОБ УСРЕДНЕНИИ:</strong> Датчик воды — "шумный" компонент. Малейшие колебания воды, пузырьки воздуха меняют сопротивление. Усреднение 20–50 измерений даёт стабильные значения. В реальной гидропонике используют скользящее среднее (moving average) или медианную фильтрацию.
+    </div>
+</div>
+
+<!-- ============== ЭКСПЕРИМЕНТ 6 ============== -->
+<h2>📌 ЭКСПЕРИМЕНТ 6 · МНОГОУРОВНЕВАЯ СИСТЕМА</h2>
+<div class="exp">
+    <h3>4 дискретных уровня · Светодиодная шкала</h3>
+    
+    <div style="position: relative; width: 100%; padding-top: calc(max(56.25%, 400px));">
+        <iframe src="https://app.cirkitdesigner.com/project/ae4519c4-0c3e-47eb-8d6d-67af9834032a?view=interactive_preview" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;"></iframe>
+    </div>
+
+    <div class="code-block">
+// ЭКСПЕРИМЕНТ 6: Многоуровневая индикация
+// 4 состояния: СУХО, ВЛАЖНО, МОКРО, КРИТИЧЕСКИ
+
+#define SENSOR A0
+#define GREEN 9
+#define YELLOW 10
+#define RED 11
+
+// Пороги (после калибровки)
+int levels[4] = {0, 200, 400, 600};  // СУХО, ВЛАЖНО, МОКРО, КРИТИЧЕСКИ
+
+void setup() {
+  pinMode(GREEN, OUTPUT);
+  pinMode(YELLOW, OUTPUT);
+  pinMode(RED, OUTPUT);
+  Serial.begin(9600);
+  Serial.println("=== 4-УРОВНЕВЫЙ ИНДИКАТОР ===");
+}
+
+void loop() {
+  int value = analogRead(SENSOR);
+  int level = 0;
+  
+  // Определяем уровень
+  if (value < levels[1]) level = 0;      // СУХО
+  else if (value < levels[2]) level = 1; // ВЛАЖНО
+  else if (value < levels[3]) level = 2; // МОКРО
+  else level = 3;                        // КРИТИЧЕСКИ
+  
+  // Управление светодиодами
+  switch(level) {
+    case 0: // СУХО — все выключены
+      digitalWrite(GREEN, LOW);
+      digitalWrite(YELLOW, LOW);
+      digitalWrite(RED, LOW);
+      break;
+      
+    case 1: // ВЛАЖНО — зелёный
+      digitalWrite(GREEN, HIGH);
+      digitalWrite(YELLOW, LOW);
+      digitalWrite(RED, LOW);
+      break;
+      
+    case 2: // МОКРО — жёлтый
+      digitalWrite(GREEN, LOW);
+      digitalWrite(YELLOW, HIGH);
+      digitalWrite(RED, LOW);
+      break;
+      
+    case 3: // КРИТИЧЕСКИ — красный
+      digitalWrite(GREEN, LOW);
+      digitalWrite(YELLOW, LOW);
+      digitalWrite(RED, HIGH);
+      break;
+  }
+  
+  // Вывод в монитор
+  static unsigned long lastPrint = 0;
+  if (millis() - lastPrint > 500) {
+    lastPrint = millis();
+    Serial.print("Сигнал: ");
+    Serial.print(value);
+    Serial.print(" | Уровень: ");
+    Serial.print(level);
+    Serial.print(" (");
+    switch(level) {
+      case 0: Serial.print("СУХО"); break;
+      case 1: Serial.print("ВЛАЖНО"); break;
+      case 2: Serial.print("МОКРО"); break;
+      case 3: Serial.print("КРИТИЧЕСКИ"); break;
+    }
+    Serial.println(")");
+  }
+}
+    </div>
+
+    <div class="fact">
+        🎯 <strong>ФАКТ О ДИСКРЕТИЗАЦИИ:</strong> Превращение непрерывного сигнала (0–1023) в конечное число состояний называется дискретизацией по уровню (квантованием). В АЦП это неизбежно. В датчиках дождя для автомобилей обычно используют 2-3 порога: "сухо", "влажно", "сильный дождь".
+    </div>
+    
+    <div class="fact">
+        💡 <strong>ПРИМЕНЕНИЕ:</strong> Именно так работают индикаторы уровня жидкости в стиральных машинах, посудомойках, системах автополива. Там нет экранов — только светодиоды.
+    </div>
+</div>
+
+<!-- ============== ЭКСПЕРИМЕНТ 7 ============== -->
+<h2>📌 ЭКСПЕРИМЕНТ 7 · ИЗМЕРЕНИЕ ПРОВОДИМОСТИ ВОДЫ</h2>
+<div class="exp">
+    <h3>Сравнение водопроводной и дистиллированной воды</h3>
+    
+    <div style="position: relative; width: 100%; padding-top: calc(max(56.25%, 400px));">
+            <iframe src="https://app.cirkitdesigner.com/project/bbfcadd9-662f-4117-8219-6e03439b8431?view=interactive_preview" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;"></iframe>
+    </div>
+
+    <div class="code-block">
+// ЭКСПЕРИМЕНТ 7: Тест проводимости воды
+// Чистая вода НЕ проводит ток! Ток проводят растворённые соли.
+
+#define SENSOR A0
+
+void setup() {
+  Serial.begin(9600);
+  Serial.println("=== ТЕСТ ПРОВОДИМОСТИ ВОДЫ ===");
+  Serial.println("Подготовьте образцы:");
+  Serial.println("1. Водопроводная вода");
+  Serial.println("2. Кипячёная вода");
+  Serial.println("3. Дистиллированная вода");
+  Serial.println("4. Солевой раствор (ложка соли на стакан)");
+  Serial.println("=================================");
+  delay(3000);
+}
+
+void loop() {
+  int value = analogRead(SENSOR);
+  
+  Serial.print("Значение АЦП: ");
+  Serial.print(value);
+  Serial.print(" | ");
+  
+  if (value < 100) Serial.print("💧 ДИСТИЛЛИРОВАННАЯ (изолятор)");
+  else if (value < 300) Serial.print("🚰 КИПЯЧЁНАЯ (меньше солей)");
+  else if (value < 600) Serial.print("💦 ВОДОПРОВОДНАЯ (средняя проводимость)");
+  else Serial.print("🧂 СОЛЕВОЙ РАСТВОР (высокая проводимость)");
+  
+  Serial.println();
+  delay(500);
+}
+    </div>
+
+    <div class="fact">
+        🧪 <strong>ФАКТ О ПРОВОДИМОСТИ:</strong> Химически чистая (дистиллированная) вода — диэлектрик. Её удельное сопротивление ~18 МОм·см. Водопроводная вода проводит ток из-за растворённых солей кальция, магния, натрия. Именно поэтому датчик воды — это фактически датчик минерализации.
+    </div>
+    
+    <div class="fact">
+        ⚠️ <strong>ФАКТ О ДОЛГОВЕЧНОСТИ:</strong> Датчики воды с открытыми медными дорожками подвержены электролизу. Постоянный ток вызывает коррозию. В профессиональных системах используют переменный ток или кратковременные импульсы для измерения, чтобы продлить срок службы.
+    </div>
+    
+    <div class="fact">
+        🔋 <strong>ПРИМЕНЕНИЕ:</strong> Аналогичный принцип используется в TDS-метрах (Total Dissolved Solids) — измерителях общего количества растворённых твёрдых веществ. TDS-метр показывает, сколько миллиграмм солей на литр воды.
+    </div>
+</div>
+
+<!-- ============== ТАБЛИЦА КОМПОНЕНТОВ ============== -->
+<h2>📋 СПЕЦИФИКАЦИЯ КОМПОНЕНТОВ</h2>
+<div class="exp">
+    <table>
+        <tr>
+            <th>Компонент</th>
+            <th>Назначение</th>
+            <th>Подключение</th>
+            <th>Примечание</th>
+        </tr>
+        <tr>
+            <td>🌊 Датчик воды</td>
+            <td>Измерение проводимости</td>
+            <td>VCC→5V, GND→GND, SIG→A0</td>
+            <td>Аналоговый выход 0–5В</td>
+        </tr>
+        <tr>
+            <td>💡 Светодиод</td>
+            <td>Визуальная индикация</td>
+            <td>Анод → пин (через 220Ω), катод → GND</td>
+            <td>Для PWM использовать пины 3,5,6,9,10,11</td>
+        </tr>
+        <tr>
+            <td>🔊 Зуммер активный</td>
+            <td>Звуковая сигнализация</td>
+            <td>+ → пин, - → GND</td>
+            <td>Пищит при HIGH</td>
+        </tr>
+        <tr>
+            <td>🔘 Кнопка тактовая</td>
+            <td>Калибровка, ввод</td>
+            <td>Один контакт → пин, второй → GND</td>
+            <td>Включить INPUT_PULLUP</td>
+        </tr>
+        <tr>
+            <td>🟢🟡🔴 RGB/3xLED</td>
+            <td>Многоуровневая индикация</td>
+            <td>Каждый через резистор 220Ω</td>
+            <td>Использовать общий GND</td>
+        </tr>
+    </table>
+</div>
+
+
+<!-- ============== ИНЖЕНЕРНЫЕ ЗАДАЧИ ============== -->
+<h2>📌 ЗАДАЧИ ДЛЯ САМОСТОЯТЕЛЬНОЙ РАБОТЫ</h2>
+<div class="exp">
+    <div style="background: #f5f5f5; padding: 20px; border-radius: 12px; margin-bottom: 15px;">
+        <strong style="font-size: 1.2em;">🔹 Уровень 1 (базовый)</strong>
+        <ul style="margin-top: 12px;">
+            <li>Изменить порог срабатывания и подобрать для своего стакана</li>
+            <li>Добавить второй светодиод, который горит при сильном намокании</li>
+            <li>Сделать прерывистый звуковой сигнал (0.5 сек писк, 0.5 сек пауза)</li>
+        </ul>
+    </div>
+    
+    <div style="background: #eef7fc; padding: 20px; border-radius: 12px; margin-bottom: 15px;">
+        <strong style="font-size: 1.2em;">🔸 Уровень 2 (средний)</strong>
+        <ul style="margin-top: 12px;">
+            <li>Реализовать скользящее среднее для фильтрации шумов (буфер на 10 значений)</li>
+            <li>Добавить второй датчик на пин A1 и сравнивать показания двух стаканов</li>
+            <li>Выводить данные в виде ASCII-графика в монитор порта (строка из символов █)</li>
+        </ul>
+    </div>
+    
+    <div style="background: #e2f0d9; padding: 20px; border-radius: 12px;">
+        <strong style="font-size: 1.2em;">🔹 Уровень 3 (продвинутый)</strong>
+        <ul style="margin-top: 12px;">
+            <li>Использовать EEPROM для сохранения калибровочных значений после выключения</li>
+            <li>Реализовать гистерезис (два порога: включения и выключения) для стабильной работы</li>
+            <li>Подключить ЖК-дисплей I2C и выводить уровень в процентах и мм</li>
+        </ul>
+    </div>
+</div>
+
+<!-- ============== РЕАЛЬНЫЕ ПРИМЕНЕНИЯ ============== -->
+<h2>🏭 РЕАЛЬНЫЕ ПРИМЕНЕНИЯ ДАТЧИКОВ ВОДЫ</h2>
+<div class="exp">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+        <div style="background: white; border-left: 6px solid #0288d1; padding: 18px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+            <strong>🚰 Стиральные машины</strong><br>
+            Датчик уровня пены и воды. При превышении — активация дополнительного слива.
+        </div>
+        <div style="background: white; border-left: 6px solid #0288d1; padding: 18px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+            <strong>🌱 Гидропоника</strong><br>
+            Контроль уровня питательного раствора. Автоматическое добавление воды.
+        </div>
+        <div style="background: white; border-left: 6px solid #0288d1; padding: 18px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+            <strong>💧 Метеостанции</strong><br>
+            Датчики дождя. Сигнал на закрытие окон, запуск стеклоочистителей.
+        </div>
+        <div style="background: white; border-left: 6px solid #0288d1; padding: 18px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+            <strong>🏭 Промышленность</strong><br>
+            Контроль утечек в дата-центрах, насосных станциях, химических производствах.
+        </div>
+        <div style="background: white; border-left: 6px solid #0288d1; padding: 18px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+            <strong>🚗 Автомобили</strong><br>
+            Уровень омывающей жидкости, датчик дождя, контроль охлаждающей жидкости.
+        </div>
+        <div style="background: white; border-left: 6px solid #0288d1; padding: 18px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+            <strong>🏡 Умный дом</strong><br>
+            Защита от протечек. Перекрытие кранов при обнаружении воды на полу.
+        </div>
+    </div>
+</div>
+
+<!-- ============== ЗАКЛЮЧЕНИЕ ============== -->
+<div style="background: linear-gradient(145deg, #0a3143, #143b4f); color: white; padding: 40px; border-radius: 16px; margin-top: 50px;">
+    <h2 style="background: none; color: #4fc3f7; border: none; padding: 0; margin-top: 0; display: block;">📌 ВЫВОДЫ</h2>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+        <div>
+            <p style="font-size: 1.2em; margin-bottom: 20px;">Что вы изучили:</p>
+            <ul style="list-style-type: none; padding-left: 0;">
+                <li style="margin-bottom: 12px;">✓ Аналоговое чтение (analogRead)</li>
+                <li style="margin-bottom: 12px;">✓ Пороговое срабатывание (if/else)</li>
+                <li style="margin-bottom: 12px;">✓ ШИМ-регулировка яркости (analogWrite)</li>
+                <li style="margin-bottom: 12px;">✓ Калибровка и усреднение</li>
+                <li style="margin-bottom: 12px;">✓ Многоуровневая логика</li>
+                <li style="margin-bottom: 12px;">✓ Измерение проводимости</li>
+            </ul>
+        </div>
+        <div>
+            <p style="font-size: 1.2em; margin-bottom: 20px;">Дальнейшие темы:</p>
+            <ul style="list-style-type: none; padding-left: 0;">
+                <li style="margin-bottom: 12px;">➡ Беспроводная передача данных (HC-12, nRF24L01)</li>
+                <li style="margin-bottom: 12px;">➡ Логирование на SD-карту</li>
+                <li style="margin-bottom: 12px;">➡ Пропорциональное регулирование (PID)</li>
+                <li style="margin-bottom: 12px;">➡ Защита от коррозии (переменный ток)</li>
+            </ul>
+        </div>
+    </div>
+    
+</div>
+
+</body>
+</html>
