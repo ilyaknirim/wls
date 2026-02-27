@@ -5,6 +5,92 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>💧 Датчик воды: 7 инженерных экспериментов</title>
     <style>
+        /* Прогресс-бар */
+        #loader-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a3143;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s, visibility 0.5s;
+        }
+        
+        #loader-wrapper.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .loader-content {
+            text-align: center;
+            color: white;
+            width: 80%;
+            max-width: 400px;
+        }
+        
+        .loader-title {
+            font-size: 24px;
+            margin-bottom: 30px;
+            font-weight: 500;
+            letter-spacing: 2px;
+        }
+        
+        .loader-title span {
+            color: #4fc3f7;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #2c3e50;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #4fc3f7, #0288d1);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        .loader-text {
+            font-size: 14px;
+            color: #b0d4e8;
+            margin-bottom: 20px;
+        }
+        
+        .loader-percent {
+            font-size: 32px;
+            font-weight: 700;
+            color: #4fc3f7;
+            margin-bottom: 10px;
+        }
+        
+        .loader-subtext {
+            font-size: 16px;
+            color: #ddd;
+        }
+        
+        /* Анимация пульсации */
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+        
+        .pulse {
+            animation: pulse 1.5s infinite;
+        }
+        
+        /* Остальные стили (ваши оригинальные) */
         body {
             font-family: 'Segoe UI', 'Roboto', sans-serif;
             background: #f5f7fa;
@@ -13,7 +99,14 @@
             margin: 0 auto;
             padding: 30px;
             line-height: 1.6;
+            opacity: 0;
+            transition: opacity 0.5s;
         }
+        
+        body.visible {
+            opacity: 1;
+        }
+        
         h1 {
             background: #0a3143;
             color: white;
@@ -123,6 +216,19 @@
     </style>
 </head>
 <body>
+
+<!-- Прогресс-бар загрузки -->
+<div id="loader-wrapper">
+    <div class="loader-content">
+        <div class="loader-title">💧 <span>ДАТЧИК ВОДЫ</span></div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <div class="loader-percent" id="loader-percent">0%</div>
+        <div class="loader-text" id="loader-text">Загрузка компонентов...</div>
+        <div class="loader-subtext pulse">⚡ Подготовка 7 экспериментов</div>
+    </div>
+</div>
 
 <h1>💧 ДАТЧИК УРОВНЯ ВОДЫ · 7 ИНЖЕНЕРНЫХ ЭКСПЕРИМЕНТОВ</h1>
 
@@ -750,6 +856,108 @@ void loop() {
     </div>
     
 </div>
+
+<script>
+// Скрипт для управления загрузкой и прокруткой
+(function() {
+    // Элементы
+    const loader = document.getElementById('loader-wrapper');
+    const progressFill = document.getElementById('progress-fill');
+    const loaderPercent = document.getElementById('loader-percent');
+    const loaderText = document.getElementById('loader-text');
+    const body = document.body;
+    
+    // Список ресурсов для отслеживания
+    const resources = [
+        ...document.querySelectorAll('iframe'),
+        ...document.querySelectorAll('img')
+    ];
+    
+    // Если нет ресурсов для отслеживания, добавляем искусственные
+    if (resources.length === 0) {
+        // Создаем фейковые ресурсы для демонстрации прогресса
+        for (let i = 0; i < 5; i++) {
+            const img = new Image();
+            img.src = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"></svg>');
+            resources.push(img);
+        }
+    }
+    
+    let loadedCount = 0;
+    const totalResources = resources.length;
+    
+    // Функция обновления прогресса
+    function updateProgress() {
+        const percent = Math.floor((loadedCount / totalResources) * 100);
+        progressFill.style.width = percent + '%';
+        loaderPercent.textContent = percent + '%';
+        
+        // Меняем текст в зависимости от прогресса
+        if (percent < 30) {
+            loaderText.textContent = 'Загрузка компонентов...';
+        } else if (percent < 60) {
+            loaderText.textContent = 'Инициализация датчиков...';
+        } else if (percent < 90) {
+            loaderText.textContent = 'Калибровка систем...';
+        } else {
+            loaderText.textContent = 'Почти готово...';
+        }
+        
+        // Если всё загружено
+        if (loadedCount >= totalResources) {
+            setTimeout(() => {
+                loader.classList.add('hidden');
+                body.classList.add('visible');
+                // Прокрутка вверх
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            }, 500);
+        }
+    }
+    
+    // Обработчик загрузки для каждого ресурса
+    function handleResourceLoad() {
+        loadedCount++;
+        updateProgress();
+    }
+    
+    // Добавляем обработчики для всех ресурсов
+    resources.forEach(resource => {
+        if (resource.tagName === 'IFRAME') {
+            // Для iframe используем load событие
+            resource.addEventListener('load', handleResourceLoad);
+            // Если iframe уже загружен
+            if (resource.contentDocument && resource.contentDocument.readyState === 'complete') {
+                handleResourceLoad();
+            }
+        } else if (resource.tagName === 'IMG') {
+            if (resource.complete) {
+                handleResourceLoad();
+            } else {
+                resource.addEventListener('load', handleResourceLoad);
+                resource.addEventListener('error', handleResourceLoad); // Считаем ошибку как загрузку
+            }
+        }
+    });
+    
+    // Запасной план: если через 5 секунд что-то не загрузилось, всё равно показываем страницу
+    setTimeout(() => {
+        if (!loader.classList.contains('hidden')) {
+            loader.classList.add('hidden');
+            body.classList.add('visible');
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+    }, 5000);
+    
+    // Начальное обновление
+    updateProgress();
+})();
+</script>
 
 </body>
 </html>
